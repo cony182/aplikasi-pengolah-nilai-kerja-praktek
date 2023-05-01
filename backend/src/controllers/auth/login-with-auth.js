@@ -51,7 +51,7 @@ exports.login = async (req, res) => {
    const refreshToken = jwt.sign(
       {
          _session_id: sessionId,
-         _unique_secret_id: user.uid,
+         // _unique_secret_id: user.uid,
       },
       process.env.REFRESH_TOKEN_SECRET,
       {
@@ -61,6 +61,7 @@ exports.login = async (req, res) => {
 
    const session = new Session({
       session_id: sessionId,
+      uid: user.uid,
    });
 
    // console.log(sessionId);

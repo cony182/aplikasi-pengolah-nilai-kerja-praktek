@@ -89,6 +89,7 @@ app.get("/protected", verifyToken, (req, res) => {
 
 // const session = require("./src/models/session-model");
 // const { Op } = require("sequelize");
+// // SET TO "0 1 * * *" WILL EXECUTE EVERY DAY AT 1.AM
 // cron.schedule("*/10 * * * * *", function () {
 //    console.log(10);
 //    // write your login here, delete your records

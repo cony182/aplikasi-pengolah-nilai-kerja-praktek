@@ -42,9 +42,11 @@ async function isVerify(req, res, next) {
             return res.redirect("/login");
          }
 
+         // console.log(session);
+
          const user = await User.findOne({
             where: {
-               uid: decoded._unique_secret_id,
+               uid: session.uid,
             },
          });
 
