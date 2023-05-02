@@ -3,7 +3,10 @@ const userAuthRoute = require("./src/routes/auth/login-with-auth");
 const CookieParser = require("cookie-parser");
 const cron = require("node-cron");
 const verifyToken = require("./src/middlewares/verify-token");
+const passport = require("passport");
 require("dotenv").config();
+require("./src/controllers/auth/auth-google-strategy");
+const googleAuthLogin = require("./src/controllers/auth/auth-google");
 
 const app = express();
 
@@ -15,6 +18,7 @@ app.use(
    })
 );
 app.use(userAuthRoute);
+app.use(googleAuthLogin);
 
 app.get("/", (req, res) => {
    res.send("from app.js");
@@ -34,15 +38,98 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
    res.send(`
+   <body style="background-color: #3F4E4F; color: #A5C9CA;">
    <form action="/login" method="POST">
    <h1>Sign In</h1>
    <hr>
-   <input type="text" name="email" required>
-   <input type="password" name="password" required>
-   <button type="submit">Sign Up</button>
+   <input type="text" name="email" required style="background-color: #A5C9CA; color: #A5C9CA;">
+   <input type="password" name="password" required style="background-color: #A5C9CA; color: #000000;">
+   <button type="submit" style="background-color: #A5C9CA; color: #000000;">Sign Up</button>
    </form>
+   <a href="/auth/google" style="color: #1597BB">Login with Google</a>
+   </body>
 `);
 });
+
+// app.get(
+//    "/auth/google",
+//    passport.authenticate("google", { scope: ["email", "profile"] })
+// );
+
+// const jwt = require("jsonwebtoken");
+// const Session = require("./src/models/session-model");
+// app.get(
+//    "/google/callback",
+//    passport.authenticate("google", {
+//       failureRedirect: "/fail",
+//       session: false,
+//    }),
+//    async (req, res) => {
+//       console.log("from app.js");
+//       const sessionId = Math.random().toString(36).substring(2, 36);
+
+//       const refreshToken = jwt.sign(
+//          {
+//             _session_id: sessionId,
+//          },
+//          process.env.REFRESH_TOKEN_SECRET,
+//          {
+//             expiresIn: 1000 * 60 * 60,
+//          }
+//       );
+
+//       const session = new Session({
+//          session_id: sessionId,
+//          uid: req.user.uid,
+//       });
+
+//       // console.log(sessionId);
+
+//       session.save((err, sessionId) => {
+//          if (err) {
+//             return res.status(500).send({ message: err });
+//          } else {
+//             res.status(200).send({
+//                message: "session ID" + sessionId + "registered successfully",
+//             });
+//          }
+//       });
+
+//       const accessToken = jwt.sign(
+//          {
+//             uid: req.user.uid,
+//             googleId: req.user.googleId,
+//             facebookId: req.user.facebookId,
+//             nickname: req.user.nickname,
+//             role: req.user.role,
+//             email: req.user.email,
+//             date: req.user.createdAt,
+//          },
+//          process.env.ACCESS_TOKEN_SECRET,
+//          {
+//             expiresIn: 1000 * 60,
+//          }
+//       );
+
+//       res.cookie("__secure_refresh_token", refreshToken, {
+//          maxAge: 1000 * 60 * 60,
+//          httpOnly: true,
+//          secure: true,
+//       });
+
+//       res.cookie("__main_access_token", accessToken, {
+//          maxAge: 1000 * 180,
+//          httpOnly: true,
+//          secure: true,
+//       });
+
+//       res.redirect("/home");
+//    }
+// );
+
+// app.get("/auth/google/failure", (req, res) => {
+//    res.send("something wrong");
+// });
 
 app.get("/home", verifyToken, (req, res) => {
    console.log(req.user.nickname + " mengakses /home");
@@ -50,41 +137,29 @@ app.get("/home", verifyToken, (req, res) => {
    // console.log(req.cookies.__secure_refresh_token);
 
    res.send(`
+   <body style="background-color: #3F4E4F; color: #A5C9CA;">
    <h1>Data</h1>
    <hr>
-   <p>Nickanme : ${req.user.nickname}</p>
+   <p>Nickname : ${req.user.nickname}</p>
+   <p>Google ID : ${req.user.googleId}</p>
+   <p>Facebook ID : ${req.user.facebookId}</p>
    <p>Role : ${req.user.role}</p>
    <p>Email : ${req.user.email}</p>
    <p>Date : ${req.user.date}</p>
    <p>iat : ${req.user.iat}</p>
    <p>exp : ${req.user.exp}</p>
-   <a href="/protected">Go To Protected Page</a>
-   <a href="/logout">Logout</a>
+   <a href="/protected" style="color: #1597BB">Go To Protected Page</a>
+   <a href="/logout" style="color: #1597BB">Logout</a>
+   </body>
    `);
 });
 
 app.get("/protected", verifyToken, (req, res) => {
-   if (req.user.role == "general") {
-      res.send(
-         req.user.nickname +
-            " is " +
-            req.user.role +
-            ` account from protected <a href="/logout">Logout</a>`
-      );
-   }
-   if (req.user.role == "pro") {
-      res.send(
-         req.user.nickname +
-            " is " +
-            req.user.role +
-            ` special account from protected <a href="/logout">logout</a>`
-      );
-   }
-
-   console.log(req.user.role);
+   res.send(req.user);
 });
 
-// console.log(Math.round(Date.now() / 1000));
+// console.log(String(Math.round(Date.now())).slice(-8));
+// console.log(Math.round(Date.now() / 10));
 // console.log(Math.round(Date.now() / 1000) + 50);
 
 // const session = require("./src/models/session-model");
@@ -107,8 +182,8 @@ app.listen(process.env.APP_PORT, () => {
 // Migrate table Users
 // const User = require("./src/models/user-model");
 // async function migrate() {
-//  await User.sync({ force: true });
-//  console.log("all models were sync successfully");
+//    await User.sync({ force: true });
+//    console.log("all models were sync successfully");
 // }
 // migrate();
 

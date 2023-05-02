@@ -61,6 +61,7 @@ async function isVerify(req, res, next) {
          // );
 
          const payload = {
+            googleId: user.googleId,
             nickname: user.nickname,
             role: user.role,
             email: user.email,

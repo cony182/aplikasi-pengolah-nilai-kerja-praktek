@@ -1,9 +1,5 @@
 const express = require("express");
-const {
-   register,
-   login,
-   logout,
-} = require("../../controllers/auth/login-with-auth");
+const { register, login, logout } = require("../../controllers/auth/auth-jwt");
 const router = express.Router();
 
 router.post("/register", register);

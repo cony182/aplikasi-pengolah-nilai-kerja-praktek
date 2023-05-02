@@ -3,6 +3,8 @@ const db = require("../configs/database");
 
 const { DataTypes } = Sequelize;
 
+const random = String(Math.round(Date.now()));
+
 const User = db.define(
    "users",
    {
@@ -10,7 +12,12 @@ const User = db.define(
          type: DataTypes.UUID,
          defaultValue: DataTypes.UUIDV4,
       },
-      nickname: DataTypes.STRING(20),
+      nickname: {
+         type: DataTypes.STRING(50),
+         defaultValue: "user " + random,
+      },
+      googleId: DataTypes.STRING(50),
+      facebookId: DataTypes.STRING(50),
       role: {
          type: DataTypes.ENUM("general", "pro"),
          defaultValue: "general",
@@ -25,6 +32,7 @@ const User = db.define(
             },
          },
       },
+      picture: DataTypes.STRING,
       password: {
          type: DataTypes.STRING,
          require: true,
