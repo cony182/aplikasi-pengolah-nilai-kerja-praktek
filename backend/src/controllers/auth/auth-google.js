@@ -17,7 +17,6 @@ app.get(
       session: false,
    }),
    async (req, res) => {
-      console.log("from app.js");
       const sessionId = Math.random().toString(36).substring(2, 36);
 
       const refreshToken = jwt.sign(
@@ -34,8 +33,6 @@ app.get(
          session_id: sessionId,
          uid: req.user.uid,
       });
-
-      // console.log(sessionId);
 
       session.save((err, sessionId) => {
          if (err) {

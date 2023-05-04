@@ -1,15 +1,18 @@
 const express = require("express");
-const userAuthRoute = require("./src/routes/auth/login-with-auth");
+const cors = require("cors");
+const userAuthRoute = require("./src/routes/auth/route-auth-local");
 const CookieParser = require("cookie-parser");
 const cron = require("node-cron");
 const verifyToken = require("./src/middlewares/verify-token");
-const passport = require("passport");
 require("dotenv").config();
-require("./src/controllers/auth/auth-google-strategy");
+require("./src/configs/auth-google-strategy");
 const googleAuthLogin = require("./src/controllers/auth/auth-google");
+const User = require("./src/models/user-model");
+const argon2 = require("argon2");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(CookieParser());
 app.use(
@@ -20,8 +23,33 @@ app.use(
 app.use(userAuthRoute);
 app.use(googleAuthLogin);
 
-app.get("/", (req, res) => {
-   res.send("from app.js");
+const sessionId = Math.random().toString(36).substring(2, 36) + Date.now();
+console.log(sessionId);
+
+const { Op } = require("sequelize");
+app.get("/", async (req, res) => {
+   console.log(Date.now());
+   const user = await User.findAll({ limit: 10 });
+   // const user = await User.destroy({
+   //    where: {
+   //       email: "erikbagja@gmail.com",
+   //    },
+   // });
+   // async function gen() {
+   //    for (let i = 0; i < 5000; i++) {
+   //       const random = Math.random().toString(36).substring(2, 36);
+   //       User.create({
+   //          nickname: "user" + random,
+   //          email: random + "@gmail.com",
+   //          password: await argon2.hash(random),
+   //       });
+   //    }
+   // }
+   // const run = gen();
+   // if (!run) console.log("DB failed!");
+   // console.log(user);
+   console.log(Date.now());
+   res.send(user);
 });
 
 app.get("/register", (req, res) => {
@@ -34,6 +62,10 @@ app.get("/register", (req, res) => {
    <button type="submit">Sign Up</button>
    </form>
 `);
+});
+
+app.get("/email/verify=false", (req, res) => {
+   res.send("please verify email first..");
 });
 
 app.get("/login", (req, res) => {
@@ -50,86 +82,6 @@ app.get("/login", (req, res) => {
    </body>
 `);
 });
-
-// app.get(
-//    "/auth/google",
-//    passport.authenticate("google", { scope: ["email", "profile"] })
-// );
-
-// const jwt = require("jsonwebtoken");
-// const Session = require("./src/models/session-model");
-// app.get(
-//    "/google/callback",
-//    passport.authenticate("google", {
-//       failureRedirect: "/fail",
-//       session: false,
-//    }),
-//    async (req, res) => {
-//       console.log("from app.js");
-//       const sessionId = Math.random().toString(36).substring(2, 36);
-
-//       const refreshToken = jwt.sign(
-//          {
-//             _session_id: sessionId,
-//          },
-//          process.env.REFRESH_TOKEN_SECRET,
-//          {
-//             expiresIn: 1000 * 60 * 60,
-//          }
-//       );
-
-//       const session = new Session({
-//          session_id: sessionId,
-//          uid: req.user.uid,
-//       });
-
-//       // console.log(sessionId);
-
-//       session.save((err, sessionId) => {
-//          if (err) {
-//             return res.status(500).send({ message: err });
-//          } else {
-//             res.status(200).send({
-//                message: "session ID" + sessionId + "registered successfully",
-//             });
-//          }
-//       });
-
-//       const accessToken = jwt.sign(
-//          {
-//             uid: req.user.uid,
-//             googleId: req.user.googleId,
-//             facebookId: req.user.facebookId,
-//             nickname: req.user.nickname,
-//             role: req.user.role,
-//             email: req.user.email,
-//             date: req.user.createdAt,
-//          },
-//          process.env.ACCESS_TOKEN_SECRET,
-//          {
-//             expiresIn: 1000 * 60,
-//          }
-//       );
-
-//       res.cookie("__secure_refresh_token", refreshToken, {
-//          maxAge: 1000 * 60 * 60,
-//          httpOnly: true,
-//          secure: true,
-//       });
-
-//       res.cookie("__main_access_token", accessToken, {
-//          maxAge: 1000 * 180,
-//          httpOnly: true,
-//          secure: true,
-//       });
-
-//       res.redirect("/home");
-//    }
-// );
-
-// app.get("/auth/google/failure", (req, res) => {
-//    res.send("something wrong");
-// });
 
 app.get("/home", verifyToken, (req, res) => {
    console.log(req.user.nickname + " mengakses /home");
@@ -153,6 +105,13 @@ app.get("/home", verifyToken, (req, res) => {
    </body>
    `);
 });
+
+// const EmailVerify = require("./src/models/email-verify-model");
+// async function migrate() {
+//    await EmailVerify.sync({ force: true });
+//    console.log("all email verify models were sync successfully");
+// }
+// migrate();
 
 app.get("/protected", verifyToken, (req, res) => {
    res.send(req.user);
@@ -178,18 +137,3 @@ app.get("/protected", verifyToken, (req, res) => {
 app.listen(process.env.APP_PORT, () => {
    console.log(`app running on port ${process.env.APP_PORT}..`);
 });
-
-// Migrate table Users
-// const User = require("./src/models/user-model");
-// async function migrate() {
-//    await User.sync({ force: true });
-//    console.log("all models were sync successfully");
-// }
-// migrate();
-
-// const Session = require("./src/models/session-model");
-// async function migrate() {
-//    await Session.sync({ force: true });
-//    console.log("all session models were sync successfully");
-// }
-// migrate();

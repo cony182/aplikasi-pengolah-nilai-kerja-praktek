@@ -42,23 +42,11 @@ async function isVerify(req, res, next) {
             return res.redirect("/login");
          }
 
-         // console.log(session);
-
          const user = await User.findOne({
             where: {
                uid: session.uid,
             },
          });
-
-         // const refreshToken = jwt.sign(
-         //    {
-         //       _unique_secret_id: user.uid,
-         //    },
-         //    process.env.REFRESH_TOKEN_SECRET,
-         //    {
-         //       expiresIn: 1000 * 60 * 60,
-         //    }
-         // );
 
          const payload = {
             googleId: user.googleId,
@@ -75,11 +63,6 @@ async function isVerify(req, res, next) {
                expiresIn: 1000 * 60,
             }
          );
-
-         // res.cookie("__secure_refresh_token", refreshToken, {
-         //    maxAge: 1000 * 60 * 60,
-         //    httpOnly: true,
-         // });
 
          res.cookie("__main_access_token", accessToken, {
             maxAge: 1000 * 180,

@@ -1,7 +1,8 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
-const User = require("../../models/user-model");
+const User = require("../models/user-model");
 const argon2 = require("argon2");
+const { Op } = require("sequelize");
 
 passport.use(
    new GoogleStrategy(
@@ -14,10 +15,11 @@ passport.use(
       async function (request, accessToken, refreshToken, profile, done) {
          try {
             const [user, created] = await User.findOrCreate({
-               where: { googleId: profile.id, email: profile.email },
+               where: {
+                  [Op.or]: [{ googleId: profile.id }, { email: profile.email }],
+               },
             });
 
-            console.log(created);
             if (created) {
                const hash = await argon2.hash(
                   Math.random().toString(36).substring(2, 36)
@@ -37,7 +39,10 @@ passport.use(
 
             return done(null, user);
          } catch (error) {
-            console.log("from auth google = " + error);
+            console.log(
+               "Server error. Try to login with another account or create an account instead. " +
+                  error
+            );
          }
       }
    )

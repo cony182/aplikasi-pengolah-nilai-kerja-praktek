@@ -32,6 +32,10 @@ const User = db.define(
             },
          },
       },
+      emailVerifiedAt: {
+         type: DataTypes.DATE,
+         allowNull: true,
+      },
       picture: DataTypes.STRING,
       password: {
          type: DataTypes.STRING,
@@ -51,3 +55,10 @@ const User = db.define(
 );
 
 module.exports = User;
+
+// const User = require("./src/models/user-model");
+// async function migrate() {
+//    await User.sync({ force: true });
+//    console.log("all models were sync successfully");
+// }
+// migrate();
