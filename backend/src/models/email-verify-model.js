@@ -10,7 +10,8 @@ const Emailverify = db.define(
       link: DataTypes.TEXT,
       expires: {
          type: DataTypes.INTEGER(16),
-         defaultValue: Math.round(Date.now() / 1000) + 60,
+         // defaultValue: Math.round(Date.now() / 1000) + 60,
+         allowNull: false,
       },
    },
    {

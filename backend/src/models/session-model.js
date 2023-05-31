@@ -10,7 +10,7 @@ const Session = db.define(
       uid: DataTypes.STRING,
       expires: {
          type: DataTypes.INTEGER(16),
-         defaultValue: Math.round(Date.now() / 1000) + 100,
+         defaultValue: Math.round(Date.now() / 1000 + 60 * 60 * 24),
       },
    },
    {

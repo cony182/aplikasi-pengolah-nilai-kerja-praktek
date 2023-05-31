@@ -7,7 +7,9 @@ const {
    sendEmail,
    login,
    logout,
+   googleLogin,
 } = require("../../controllers/auth/auth-local");
+
 const router = express.Router();
 
 router.post("/register", register);
@@ -17,5 +19,6 @@ router.get("/email/send/token=:token/email=:email/uid=:uid", sendEmail);
 router.get("/resend/:email/:uid", resendEmail);
 router.post("/login", login);
 router.get("/logout", logout);
+router.post("/login/google/auth", googleLogin);
 
 module.exports = router;

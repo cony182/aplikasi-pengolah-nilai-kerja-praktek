@@ -1,5 +1,7 @@
 const { Sequelize } = require("sequelize");
 const db = require("../configs/database");
+const Siswa = require("./siswa-model");
+const Guru = require("./guru-model");
 
 const { DataTypes } = Sequelize;
 
@@ -16,11 +18,15 @@ const User = db.define(
          type: DataTypes.STRING(50),
          defaultValue: "user " + random,
       },
+      fullname: {
+         type: DataTypes.STRING(50),
+         allowNull: true,
+      },
       googleId: DataTypes.STRING(50),
       facebookId: DataTypes.STRING(50),
       role: {
-         type: DataTypes.ENUM("general", "pro"),
-         defaultValue: "general",
+         type: DataTypes.ENUM("siswa", "guru", "reguler", "admin"),
+         defaultValue: "reguler",
       },
       email: {
          type: DataTypes.STRING,
@@ -45,7 +51,7 @@ const User = db.define(
    {
       indexes: [
          {
-            fields: ["email"],
+            fields: ["uid"],
          },
       ],
    },
@@ -54,11 +60,10 @@ const User = db.define(
    }
 );
 
-module.exports = User;
+User.hasOne(Guru);
+Guru.belongsTo(User);
 
-// const User = require("./src/models/user-model");
-// async function migrate() {
-//    await User.sync({ force: true });
-//    console.log("all models were sync successfully");
-// }
-// migrate();
+User.hasOne(Siswa);
+Siswa.belongsTo(User);
+
+module.exports = User;
