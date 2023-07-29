@@ -6,4 +6,4 @@ Project ini dibuat dengan tujuan penelitian, tidak untuk production. Perlu penge
 
 ## Sosial & Donasi
 - [Instagram](https://instagram.com) - Follow me [@hai.cony](https://instagram.com/hai.cony)
-- [Sociabuzz](https://sociabuzz.com) - Untuk terimakasih [Donate](https://sociabuzz.com/haicony/donate)
+- [Sociabuzz](https://sociabuzz.com) - Buy me a coffee [Donate](https://sociabuzz.com/haicony/donate)
