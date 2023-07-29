@@ -108,6 +108,7 @@ exports.login = async (req, res) => {
             id: user.id,
             uid: user.uid,
             role: user.role,
+            isReguler: user.isReguler,
          },
          process.env.ACCESS_TOKEN_SECRET
       );
@@ -115,16 +116,17 @@ exports.login = async (req, res) => {
       await Session.create({
          session_id: sessionId,
          uid: user.uid,
+         expires: Date.now() + Number(process.env.REFRESH_TOKEN_AGE),
       });
 
       res.cookie("__secure_refresh_token", refreshToken, {
-         maxAge: 1000 * 60 * 60,
+         maxAge: process.env.REFRESH_TOKEN_AGE,
          httpOnly: true,
          sameSite: "Strict",
       });
 
       res.cookie("__main_access_token", accessToken, {
-         maxAge: 1000 * 180,
+         maxAge: process.env.ACCESS_TOKEN_AGE,
          httpOnly: true,
          sameSite: "Strict",
       });

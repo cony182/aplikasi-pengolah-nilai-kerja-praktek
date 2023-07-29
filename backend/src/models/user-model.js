@@ -17,6 +17,8 @@ const User = db.define(
       nickname: {
          type: DataTypes.STRING(50),
          defaultValue: "user " + random,
+         allowNull: false,
+         unique: true,
       },
       fullname: {
          type: DataTypes.STRING(50),
@@ -37,6 +39,10 @@ const User = db.define(
                msg: "Must be a valid email address",
             },
          },
+      },
+      isReguler: {
+         type: DataTypes.BOOLEAN,
+         defaultValue: 1,
       },
       emailVerifiedAt: {
          type: DataTypes.DATE,

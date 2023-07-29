@@ -47,10 +47,6 @@ const Siswa = db.define("siswa", {
       type: DataTypes.STRING(16),
       allowNull: true,
    },
-   email: {
-      type: DataTypes.STRING(32),
-   },
-   picture: DataTypes.STRING,
 });
 
 Siswa.hasMany(Nilai);

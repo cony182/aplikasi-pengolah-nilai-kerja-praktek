@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import Default from "../layouts/Default";
 
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Grade = () => {
+   const navigate = useNavigate();
    const [nilai, setNilai] = useState([]);
    const [loading, setLoading] = useState(true);
    const [siswa, setSiswa] = useState([]);
@@ -13,7 +15,7 @@ const Grade = () => {
 
    useEffect(() => {
       axios
-         .get("http://192.168.100.2:5000/siswa/nilai", { withCredentials: true })
+         .get("/siswa/nilai", { withCredentials: true })
          .then((response) => {
             setNilai(response.data[0]);
             setSiswa(response.data[1]);
@@ -80,77 +82,28 @@ const Grade = () => {
                         <label htmlFor="select" className="font-semibold block dark:text-gray-400 mr-5">
                            Tahun:
                         </label>
-                        <div className="relative">
-                           <div className="h-6 bg-white dark:bg-slate-700 flex rounded-full items-center">
-                              <input
-                                 defaultValue={tahun}
-                                 name="select"
-                                 type="button"
-                                 htmlFor="show_more"
-                                 id="select"
-                                 className="px-4 appearance-none outline-none bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-400 w-full"
-                                 defaultChecked=""
-                              />
-                              <label
-                                 htmlFor="show_more"
-                                 className="cursor-pointer outline-none rotate-180 focus:rotate-180 focus:outline-none transition-all text-gray-300 hover:text-gray-600"
-                              >
-                                 <svg
-                                    className="w-4 h-4 mx-2 fill-current"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                 >
-                                    <polyline points="18 15 12 9 6 15" />
-                                 </svg>
-                              </label>
-                           </div>
-                           <input type="checkbox" name="show_more" id="show_more" className="hidden peer" defaultChecked="" />
-                           <div className="absolute rounded shadow bg-white overflow-hidden hidden z-20 peer-checked:flex flex-col w-full mt-1 border border-gray-200">
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setTahun(2020)}
-                                 >
-                                    2020
-                                 </a>
-                              </div>
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setTahun(2021)}
-                                 >
-                                    2021
-                                 </a>
-                              </div>
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setTahun(2022)}
-                                 >
-                                    2022
-                                 </a>
-                              </div>
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setTahun(2023)}
-                                 >
-                                    2023
-                                 </a>
-                              </div>
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setTahun(2024)}
-                                 >
-                                    2024
-                                 </a>
-                              </div>
-                           </div>
+                        <div className="relative inline-flex">
+                           <svg
+                              className="w-4 h-4 absolute text-white rotate-180 font-semibold right-0 top-0 -translate-y-3 translate-x-3 m-4 pointer-events-none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                           >
+                              <polyline points="18 15 12 9 6 15" />
+                           </svg>
+                           <select className="text-gray-400 rounded-full flex h-6 w-20 pl-2 pr-4 dark:bg-slate-700 hover:border-gray-400 focus:outline-none appearance-none">
+                              <option className="text-sm" disabled={true}>
+                                 Pilih..
+                              </option>
+                              <option>2021</option>
+                              <option>2022</option>
+                              <option>2023</option>
+                              <option>2024</option>
+                              <option>2025</option>
+                           </select>
                         </div>
                      </div>
                   </div>
@@ -159,53 +112,28 @@ const Grade = () => {
                         <label htmlFor="select" className="font-semibold block dark:text-gray-400 mr-5">
                            Semester:
                         </label>
-                        <div className="relative">
-                           <div className="h-6 bg-white dark:bg-slate-700 flex rounded-full items-center">
-                              <input
-                                 defaultValue={semester}
-                                 name="select"
-                                 type="button"
-                                 htmlFor="show_more_semester"
-                                 id="select"
-                                 className="px-4 appearance-none outline-none bg-white dark:bg-slate-700 text-gray-800 dark:text-gray-400 w-full"
-                                 defaultChecked=""
-                              />
-                              <label
-                                 htmlFor="show_more_semester"
-                                 className="cursor-pointer outline-none rotate-180 focus:rotate-180 focus:outline-none transition-all text-gray-300 hover:text-gray-600"
-                              >
-                                 <svg
-                                    className="w-4 h-4 mx-2 fill-current"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                 >
-                                    <polyline points="18 15 12 9 6 15" />
-                                 </svg>
-                              </label>
-                           </div>
-                           <input type="checkbox" name="show_more" id="show_more_semester" className="hidden peer" defaultChecked="" />
-                           <div className="absolute rounded shadow bg-white overflow-hidden hidden z-20 peer-checked:flex flex-col w-full mt-1 border border-gray-200">
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setSemester(1)}
-                                 >
-                                    1
-                                 </a>
-                              </div>
-                              <div className="cursor-pointer group">
-                                 <a
-                                    className="block p-2 border-transparent border-l-4 group-hover:border-blue-600 group-hover:bg-gray-100"
-                                    onClick={() => setSemester(2)}
-                                 >
-                                    2
-                                 </a>
-                              </div>
-                           </div>
+                        <div className="relative inline-flex">
+                           <svg
+                              className="w-4 h-4 absolute text-white rotate-180 font-semibold right-0 top-0 -translate-y-3 translate-x-3 m-4 pointer-events-none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                           >
+                              <polyline points="18 15 12 9 6 15" />
+                           </svg>
+                           <select className="text-gray-400 rounded-full flex h-6 w-20 pl-2 pr-4 dark:bg-slate-700 hover:border-gray-400 focus:outline-none appearance-none">
+                              <option className="text-sm" disabled={true}>
+                                 Pilih..
+                              </option>
+                              <option>1</option>
+                              <option>2</option>
+                              <option>3</option>
+                              <option>4</option>
+                              <option>5</option>
+                           </select>
                         </div>
                      </div>
                   </div>

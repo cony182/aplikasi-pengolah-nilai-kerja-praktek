@@ -44,10 +44,6 @@ const Guru = db.define(
          type: DataTypes.STRING(16),
          allowNull: true,
       },
-      email: {
-         type: DataTypes.STRING(32),
-      },
-      picture: DataTypes.STRING,
    },
    {
       freezeTableName: true,

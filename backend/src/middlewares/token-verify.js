@@ -28,6 +28,18 @@ async function tokenVerify(req, res, next) {
             },
          });
 
+         if (Date.now() + 5000000000 > session.expires) {
+            await Session.update({
+               expires: Date.now() + process.env.REFRESH_TOKEN_AGE,
+            });
+
+            res.cookie("__secure_refresh_token", accessToken, {
+               maxAge: process.env.REFRESH_TOKEN_AGE,
+               httpOnly: true,
+               sameSite: "Strict",
+            });
+         }
+
          if (!session) {
             res.clearCookie("__secure_refresh_token");
             return res.status(400).json({ message: "Sorry, we can't find your credentials" });
@@ -42,20 +54,14 @@ async function tokenVerify(req, res, next) {
          const payload = {
             id: user.id,
             uid: user.uid,
-            // googleId: user.googleId,
-            // facebookId: user.facebookId,
-            // nickname: user.nickname,
-            // fullname: user.fullname,
             role: user.role,
-            // email: user.email,
+            isReguler: user.isReguler,
          };
 
-         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: 1000 * 60,
-         });
+         const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
 
          res.cookie("__main_access_token", accessToken, {
-            maxAge: 1000 * 60 * 5,
+            maxAge: process.env.ACCESS_TOKEN_AGE,
             httpOnly: true,
             sameSite: "Strict",
          });
@@ -65,9 +71,10 @@ async function tokenVerify(req, res, next) {
 
       const newToken = req.cookies.__main_access_token || newAccessToken; // Ambil token dari client, jika tidak ada ambil dari access token baru
 
-      jwt.verify(newToken, process.env.ACCESS_TOKEN_SECRET, function (err, data) {
+      jwt.verify(newToken, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
          if (err) return res.status(403).json({ message: "Invalid Token" });
-         req.user = data.role == "guru" || data.role == "siswa" ? data : null;
+         const reguler = { uid: data.uid, isReguler: data.isReguler, role: data.role };
+         req.user = data.role == "guru" || data.role == "siswa" ? data : reguler;
       });
       next();
    } catch (error) {

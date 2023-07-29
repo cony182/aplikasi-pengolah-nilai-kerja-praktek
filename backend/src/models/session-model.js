@@ -9,8 +9,8 @@ const Session = db.define(
       session_id: DataTypes.STRING(32),
       uid: DataTypes.STRING,
       expires: {
-         type: DataTypes.INTEGER(16),
-         defaultValue: Math.round(Date.now() / 1000 + 60 * 60 * 24),
+         type: DataTypes.BIGINT,
+         defaultValue: Date.now(),
       },
    },
    {

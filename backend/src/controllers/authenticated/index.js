@@ -8,6 +8,7 @@ const Posts = require("../../models/post-model");
 const Siswa = require("../../models/siswa-model");
 const User = require("../../models/user-model");
 const WaliKelas = require("../../models/wali-kelas-model");
+const ThnAjaran = require("../../models/tahun-ajar");
 
 exports.token = async (req, res) => {
    res.status(200).json(req.user);
@@ -16,7 +17,6 @@ exports.token = async (req, res) => {
 exports.profile = async (req, res) => {
    if (!req.user) return res.status(403).json({ message: "Not a valid token data" });
 
-   console.log(req.user);
    try {
       if (req.user.role === "siswa") {
          const user = await User.findOne({
@@ -94,6 +94,87 @@ exports.profileUpdate = async (req, res) => {
    }
 };
 
+exports.nilaiGuru = async (req, res) => {
+   try {
+      const guru = await Guru.findOne({ attributes: ["id", "mapelId"], where: { userId: req.user.id } });
+      const nilai = await Nilai.findAll({
+         include: [
+            { model: Mapel, attributes: ["nama_mapel"] },
+            { model: Siswa, attributes: ["nama"] },
+         ],
+         where: { guruId: guru.id, mapelId: req.query.mapel, tahun: req.query.tahun, semester: req.query.semester },
+      });
+
+      const waliKelas = await WaliKelas.findOne({ where: { guruId: guru.id } });
+
+      const siswa = await Siswa.findAll({ where: { waliKelaId: waliKelas.id } });
+
+      const mapel = await Mapel.findAll({ attributes: ["id", "nama_mapel"] });
+      const tahun = await ThnAjaran.findAll();
+      res.status(200).json({ nilai: nilai, mapel: mapel, tahun: tahun, siswa: siswa });
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+exports.nilaiGuruUpdate = async (req, res) => {
+   try {
+      await Nilai.update(
+         {
+            nilai_kehadiran: req.body.kehadiran,
+            nilai_tugas: req.body.tugas,
+            nilai_uts: req.body.uts,
+            nilai_uas: req.body.uas,
+            nilai_opsi: req.body.opsi,
+         },
+         { where: { id: req.body.id } }
+      );
+      res.status(200).json({ message: "OK" });
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+exports.nilaiGuruTambah = async (req, res) => {
+   console.log(req.query);
+   try {
+      const guru = await Guru.findOne({ attributes: ["id", "mapelId"], where: { userId: req.user.id } });
+
+      const waliKelas = await WaliKelas.findOne({ where: { guruId: guru.id } });
+
+      const siswa = await Siswa.findAll({ include: [{ model: Kelas }], where: { waliKelaId: waliKelas.id } });
+
+      const mapel = await Mapel.findAll({ attributes: ["id", "nama_mapel"] });
+      const tahun = await ThnAjaran.findAll();
+      res.status(200).json({ mapel: mapel, tahun: tahun, siswa: siswa });
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+exports.nilaiGuruCreate = async (req, res) => {
+   console.log(req.body);
+   try {
+      const guru = await Guru.findOne({ attributes: ["id"], where: { userId: req.user.id } });
+
+      await Nilai.create({
+         tahun: req.body.tahun,
+         semester: req.body.semester,
+         nilai_kehadiran: req.body.kehadiran,
+         nilai_tugas: req.body.tugas,
+         nilai_uts: req.body.uts,
+         nilai_uas: req.body.uas,
+         nilai_opsi: req.body.opsi,
+         mapelId: req.body.mapelId,
+         siswaId: req.body.siswaId,
+         guruId: guru.id,
+      });
+      res.status(200).json({ message: "Nilai berhasil ditambahkan" });
+   } catch (error) {
+      console.log(error);
+   }
+};
+
 exports.nilaiSiswa = async (req, res) => {
    if (!req.user) return res.status(403).json({ message: "Not a valid token data" });
 
@@ -102,9 +183,9 @@ exports.nilaiSiswa = async (req, res) => {
 
       const siswa = await Siswa.findOne({
          include: [{ model: Kelas, attributes: ["kode_kelas", "nama_kelas"] }],
-         attributes: ["NIS", "nama", "tgl_lahir", "tmpt_lahir", "kelamin", "alamat", "thn_masuk", "semester", "thn_tempuh", "telp"],
+         attributes: ["NIS", "nama", "tgl_lahir", "tmpt_lahir", "kelamin", "alamat", "thn_masuk", "semester", "thn_tempuh"],
          where: {
-            id: req.user.id,
+            userId: req.user.id,
          },
       });
 
@@ -138,27 +219,55 @@ exports.nilaiSiswa = async (req, res) => {
 };
 
 exports.jadwal = async (req, res) => {
-   const siswa = await Siswa.findOne({
-      attributes: ["kelaId"],
-      where: {
-         userId: req.user.id,
-      },
-   });
+   if (req.user.isReguler || req.user.role == "admin") return res.status(403).json({ message: "Anda tidak memiliki akses" });
 
-   const jadwal = await Jadwal.findAll({
-      include: [
-         { model: Mapel, attributes: ["nama_mapel"] },
-         { model: Guru, attributes: ["nama"] },
-      ],
-      attributes: ["id", "hari", "jam_mulai", "jam_akhir"],
-      where: {
-         kelaId: siswa.kelaId,
-      },
-   });
+   if (req.user.role == "siswa") {
+      const siswa = await Siswa.findOne({
+         attributes: ["kelaId"],
+         where: {
+            userId: req.user.id,
+         },
+      });
 
-   const role = req.user.role;
+      const jadwal = await Jadwal.findAll({
+         include: [
+            { model: Mapel, attributes: ["nama_mapel"] },
+            { model: Guru, attributes: ["nama"] },
+         ],
+         attributes: ["id", "hari", "jam_mulai", "jam_akhir"],
+         where: {
+            kelaId: siswa.kelaId,
+         },
+      });
 
-   res.status(200).json([jadwal, role]);
+      const role = req.user.role;
+
+      res.status(200).json({ jadwal: jadwal, role: role });
+   }
+
+   if (req.user.role == "guru") {
+      const guru = await Guru.findOne({
+         attributes: ["id"],
+         where: {
+            userId: req.user.id,
+         },
+      });
+
+      const jadwal = await Jadwal.findAll({
+         include: [
+            { model: Mapel, attributes: ["nama_mapel"] },
+            { model: Guru, attributes: ["nama"] },
+         ],
+         attributes: ["id", "hari", "jam_mulai", "jam_akhir"],
+         where: {
+            guruId: guru.id,
+         },
+      });
+
+      const role = req.user.role;
+
+      res.status(200).json({ jadwal: jadwal, role: role });
+   }
 };
 
 exports.news = async (req, res) => {

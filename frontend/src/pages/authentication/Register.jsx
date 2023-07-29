@@ -7,8 +7,7 @@ import Loading from "../../components/Loading";
 const Register = () => {
    const navigate = useNavigate();
 
-   const googleID =
-      "979784616518-3p87frhc27piklt5kjvbeq54rlr4ikh6.apps.googleusercontent.com";
+   const googleID = "979784616518-3p87frhc27piklt5kjvbeq54rlr4ikh6.apps.googleusercontent.com";
 
    const [loading, setLoading] = useState(true);
    const [fullname, setFullname] = useState();
@@ -21,7 +20,7 @@ const Register = () => {
 
    useEffect(() => {
       axios
-         .get("http://localhost:5000/register", { withCredentials: true })
+         .get("/register", { withCredentials: true })
          .then((response) => {
             setLoading(false);
             if (response.status == 200) navigate("/home");
@@ -43,7 +42,7 @@ const Register = () => {
 
       axios
          .post(
-            "http://localhost:5000/register",
+            "/register",
             {
                fullname: fullname,
                email: email,
@@ -98,38 +97,24 @@ const Register = () => {
                <div className="flex flex-wrap items-center">
                   <div className="w-full md:w-3/4 mx-auto border-stroke dark:border-strokedark">
                      <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-                        <span className="mb-1.5 block font-medium">
-                           Register
-                        </span>
-                        <h2 className="mb-9 text-2xl font-bold text-black sm:text-title-xl2">
-                           SDN Waringin I
-                        </h2>
+                        <span className="mb-1.5 block font-medium">Register</span>
+                        <h2 className="mb-9 text-2xl font-bold text-black sm:text-title-xl2">SDN Waringin I</h2>
 
                         <form onSubmit={register}>
                            <div className="mb-6">
-                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">
-                                 Nama
-                              </label>
+                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">Nama</label>
                               <div className="relative">
                                  <input
                                     type="text"
                                     placeholder="Nama Lengkap"
                                     value={fullname}
-                                    onChange={(e) =>
-                                       setFullname(e.target.value)
-                                    }
+                                    onChange={(e) => setFullname(e.target.value)}
                                     className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none"
                                     required
                                  />
 
                                  <span className="absolute right-4 top-4">
-                                    <svg
-                                       className="fill-current"
-                                       width="22"
-                                       height="22"
-                                       xmlns="http://www.w3.org/2000/svg"
-                                       viewBox="0 0 448 512"
-                                    >
+                                    <svg className="fill-current" width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                        <g opacity="0.5">
                                           <path d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z" />
                                        </g>
@@ -139,9 +124,7 @@ const Register = () => {
                            </div>
 
                            <div className="mb-4">
-                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">
-                                 Email
-                              </label>
+                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">Email</label>
                               <div className="relative">
                                  <input
                                     type="email"
@@ -174,27 +157,17 @@ const Register = () => {
                                     </svg>
                                  </span>
                               </div>
-                              {emailErr ? (
-                                 <div className="text-sm text-red-500 text-right mr-3">
-                                    Email tidak tersedia
-                                 </div>
-                              ) : (
-                                 ""
-                              )}
+                              {emailErr ? <div className="text-sm text-red-500 text-right mr-3">Email tidak tersedia</div> : ""}
                            </div>
 
                            <div className="mb-6">
-                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">
-                                 Password
-                              </label>
+                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">Password</label>
                               <div className="relative">
                                  <input
                                     type="password"
                                     placeholder="Minimal 8 Karakter"
                                     value={password}
-                                    onChange={(e) =>
-                                       setPassword(e.target.value)
-                                    }
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className={
                                        confirmPasswordErr
                                           ? "w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none  border-red-500"
@@ -228,17 +201,13 @@ const Register = () => {
                            </div>
 
                            <div className="mb-6">
-                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">
-                                 Konfirmasi Password
-                              </label>
+                              <label className="mb-2.5 block font-medium text-left ml-3 text-black">Konfirmasi Password</label>
                               <div className="relative">
                                  <input
                                     type="password"
                                     placeholder="Minimal 8 Karakter"
                                     value={confirmPassword}
-                                    onChange={(e) =>
-                                       setConfirmPassword(e.target.value)
-                                    }
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
                                     className={
                                        confirmPasswordErr
                                           ? "w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none border-red-500"
@@ -270,9 +239,7 @@ const Register = () => {
                                  </span>
                               </div>
                               {confirmPasswordErr ? (
-                                 <div className="text-right text-sm mr-3 text-red-500">
-                                    Password dan konf. password tidak cocok
-                                 </div>
+                                 <div className="text-right text-sm mr-3 text-red-500">Password dan konf. password tidak cocok</div>
                               ) : (
                                  ""
                               )}
@@ -307,13 +274,7 @@ const Register = () => {
                                     disabled={renderProps.disabled}
                                  >
                                     <span>
-                                       <svg
-                                          width="20"
-                                          height="20"
-                                          viewBox="0 0 20 20"
-                                          fill="none"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                       >
+                                       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                           <g clipPath="url(#clip0_191_13499)">
                                              <path
                                                 d="M19.999 10.2217C20.0111 9.53428 19.9387 8.84788 19.7834 8.17737H10.2031V11.8884H15.8266C15.7201 12.5391 15.4804 13.162 15.1219 13.7195C14.7634 14.2771 14.2935 14.7578 13.7405 15.1328L13.7209 15.2571L16.7502 17.5568L16.96 17.5774C18.8873 15.8329 19.9986 13.2661 19.9986 10.2217"
@@ -334,11 +295,7 @@ const Register = () => {
                                           </g>
                                           <defs>
                                              <clipPath id="clip0_191_13499">
-                                                <rect
-                                                   width="20"
-                                                   height="20"
-                                                   fill="white"
-                                                />
+                                                <rect width="20" height="20" fill="white" />
                                              </clipPath>
                                           </defs>
                                        </svg>
@@ -351,10 +308,7 @@ const Register = () => {
                            <div className="mt-6 text-center">
                               <p>
                                  Sudah punya akun?{" "}
-                                 <Link
-                                    to="/login"
-                                    className="text-primary underline text-blue-800"
-                                 >
+                                 <Link to="/login" className="text-primary underline text-blue-800">
                                     Login
                                  </Link>
                               </p>

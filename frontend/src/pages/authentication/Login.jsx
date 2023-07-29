@@ -19,9 +19,9 @@ const Login = () => {
 
    useEffect(() => {
       axios
-         .get("http://192.168.100.2:5000/login", { withCredentials: true })
+         .get("/login", { withCredentials: true })
          .then((response) => {
-            console.log(response);
+            // console.log(response);
             setLoading(false);
             if (response.status == 200) navigate("/home");
          })
@@ -45,7 +45,7 @@ const Login = () => {
 
       axios
          .post(
-            "http://192.168.100.2:5000/login",
+            "/login",
             {
                email: email,
                password: password,
@@ -58,18 +58,18 @@ const Login = () => {
             const split = token.split(".")[1];
             const decode = atob(split);
             const decoded = JSON.parse(decode);
-            setLoading(false);
 
-            if (decoded.role) {
+            if (decoded.role == "siswa" || decoded.role == "guru") {
                navigate("/" + decoded.role + "/jadwal");
             } else {
                navigate("/home");
             }
 
-            // if(decoded.role == "admin") navigate("/admin")
+            if (decoded.role == "admin") navigate("/admin");
+            setLoading(false);
          })
          .catch((err) => {
-            console.log(err);
+            // console.log(err);
             setProccessing(false);
             if (err.response.status === 400) {
                setErrorInput(err.response.data.message);
@@ -135,9 +135,9 @@ const Login = () => {
                <div className="flex flex-wrap items-center">
                   <div className="hidden w-full xl:block xl:w-1/2">
                      <div className="py-17.5 px-26 text-center">
-                        <p className="2xl:px-20">Lorem ipsum dolor sit amet, consectetur adipiscing elit suspendisse.</p>
+                        {/* <p className="2xl:px-20">Lorem ipsum dolor sit amet, consectetur adipiscing elit suspendisse.</p> */}
 
-                        <span className="mt-15 inline-block">IMAGE</span>
+                        <span className="mt-15 inline-block font-bold">L O G I N</span>
                      </div>
                   </div>
 

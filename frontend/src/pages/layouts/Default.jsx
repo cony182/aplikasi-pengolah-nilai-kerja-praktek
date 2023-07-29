@@ -10,6 +10,18 @@ const Default = (props) => {
 
    const [miniSidebar, setMiniSidebar] = useState(localStorage.getItem("miniSidebar") === "true" ? true : false);
    const [mobileSidebar, setMobileSidebar] = useState(false);
+   const [isGuru, setIsGuru] = useState();
+
+   useEffect(() => {
+      axios
+         .get("/reguler", { withCredentials: true })
+         .then((response) => {
+            // setIsGuru(response.data.role == "guru" ? true : false);
+         })
+         .catch((err) => {
+            console.log(err);
+         });
+   }, []);
 
    useEffect(() => {
       setMiniSidebar(localStorage.getItem("miniSidebar") === "true" ? true : false);
@@ -22,9 +34,8 @@ const Default = (props) => {
    const logout = (e) => {
       e.preventDefault();
       axios
-         .get("http://192.168.100.2:5000/logout", { withCredentials: true })
+         .get("/logout", { withCredentials: true })
          .then((response) => {
-            console.log(response);
             navigate("/");
          })
          .catch((err) => {
@@ -62,23 +73,9 @@ const Default = (props) => {
                            }`}
                            id="jadwal"
                         >
-                           <span className={miniSidebar ? "hidden mr-5" : "md:block mr-5"}>Jadwal</span>
+                           <span className={miniSidebar ? "hidden mr-5" : "md:block mr-5"}>Dashboard</span>
                            <span className="scale-125">
                               <ion-icon name="book-outline"></ion-icon>
-                           </span>
-                        </Link>
-                     </li>
-                     <li className="hover:bg-gray-100 dark:hover:bg-slate-800 transition duration-300" title="Berita">
-                        <Link
-                           to={`/${role}/berita`}
-                           className={`h-16 px-6 flex justify-between items-center w-full dark:text-gray-400 transition-transform duration-300 hover:translate-x-2 ${
-                              activeNavlink == "berita" ? "bg-blue-100 dark:bg-slate-800 rounded-r-full" : ""
-                           }`}
-                           id="berita"
-                        >
-                           <span className={miniSidebar ? "hidden mr-5" : "md:block mr-5"}>Berita</span>
-                           <span className="scale-125">
-                              <ion-icon name="newspaper-outline"></ion-icon>
                            </span>
                         </Link>
                      </li>

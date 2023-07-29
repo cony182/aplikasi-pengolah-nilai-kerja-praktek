@@ -1,18 +1,8 @@
 const express = require("express");
-const {
-   register,
-   emailVerify,
-   expiredEmailVerify,
-   resendEmail,
-   sendEmail,
-   login,
-   logout,
-   googleLogin,
-} = require("../../controllers/auth/auth-local");
+const { emailVerify, expiredEmailVerify, resendEmail, sendEmail, login, logout, googleLogin } = require("../../controllers/authentication/register");
 
 const router = express.Router();
 
-router.post("/register", register);
 router.get("/email/verify/token=:token/uid=:uid", emailVerify);
 router.get("/email/verify/token=:token/uid=:uid/expired", expiredEmailVerify);
 router.get("/email/send/token=:token/email=:email/uid=:uid", sendEmail);

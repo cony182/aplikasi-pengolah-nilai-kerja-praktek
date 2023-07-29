@@ -6,7 +6,6 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const { template } = require("../../configs/nodemailer-email-template");
 const Emailverify = require("../../models/email-verify-model");
-const { Op, json } = require("sequelize");
 
 const transport = nodemailer.createTransport({
    host: "smtp.gmail.com",
@@ -23,9 +22,7 @@ Jika user mempunyai refresh token maka user dianggap sudah melakukan login dan s
 Jika user tidak mempunyai refresh token maka server akan mengembalikan response 202 
 */
 exports.registerIndex = (req, res) => {
-   req.cookies.__secure_refresh_token
-      ? res.status(200).json({ message: "Already login" })
-      : res.status(202).json({ message: "Not logged in" });
+   req.cookies.__secure_refresh_token ? res.status(200).json({ message: "Already login" }) : res.status(202).json({ message: "Not logged in" });
 };
 
 /*
@@ -45,12 +42,7 @@ exports.registerIndex = (req, res) => {
    payload sudah kedaluarsa (expire) atau belum 
 */
 exports.register = async (req, res) => {
-   if (
-      !req.body.fullname ||
-      !req.body.email ||
-      !req.body.password ||
-      !req.body.confirmPassword
-   )
+   if (!req.body.fullname || !req.body.email || !req.body.password || !req.body.confirmPassword)
       return res.status(400).json({ message: "Form not full" });
 
    try {
@@ -60,8 +52,7 @@ exports.register = async (req, res) => {
          },
       });
 
-      if (userExist)
-         return res.status(409).json({ message: "Email not available" });
+      if (userExist) return res.status(409).json({ message: "Email not available" });
 
       const user = await User.create({
          fullname: req.body.fullname,
@@ -100,14 +91,14 @@ exports.register = async (req, res) => {
       };
 
       transport.sendMail(mailOptions, (error, info) => {
-         if (error) {
-            return console.log(error);
-         }
+         if (error) return console.log(error);
+
          console.log("Email sent to: " + req.body.email);
       });
 
       res.status(200).json({ url: encode });
    } catch (error) {
+      console.log(error);
       res.status(500).json({
          message: "Cannot register. Server error with status code 500",
       });
@@ -127,12 +118,9 @@ exports.register = async (req, res) => {
 exports.emailVerify = async (req, res) => {
    //Ubah method jadi post jangan get
    try {
-      if (!req.params.token)
-         return res.status(400).json({ message: "Invalid token" });
+      if (!req.params.token) return res.status(400).json({ message: "Invalid token" });
 
-      const decode = Buffer.from(req.params.token, "base64url").toString(
-         "ascii"
-      ); // decode
+      const decode = Buffer.from(req.params.token, "base64url").toString("ascii"); // decode
 
       const jsonParse = JSON.parse(decode);
 
@@ -141,21 +129,16 @@ exports.emailVerify = async (req, res) => {
             link: jsonParse.verifyLink,
          },
       });
-      if (!result)
-         return res.status(404).json({ message: "error from email verify" });
+      if (!result) return res.status(404).json({ message: "error from email verify" });
 
       if (Math.round(Date.now() / 1000) > result.expires) {
          return res.status(403).json({ message: "Your token is expired" });
       }
 
-      await User.update(
-         { emailVerifiedAt: Date.now() },
-         { where: { uid: jsonParse.uid } }
-      );
+      await User.update({ emailVerifiedAt: Date.now() }, { where: { uid: jsonParse.uid } });
 
       // ======= REDIRECT TO AUTHENTICATED PAGE =======
-      const sessionId =
-         Math.random().toString(36).substring(2, 36) + Date.now();
+      const sessionId = Math.random().toString(36).substring(2, 36) + Date.now();
 
       const user = await User.findOne({
          where: {
@@ -209,13 +192,10 @@ exports.emailVerify = async (req, res) => {
          sameSite: "Strict",
       });
 
-      res.status(200).json({
-         message: "User with email " + user.email + "grant authorized",
-      });
+      res.status(200).json({ message: "User with email " + user.email + "grant authorized" });
    } catch (error) {
       res.status(500).json({
-         message:
-            "Sorry, we can't verify your email. Server error with 500 status code.",
+         message: "Sorry, we can't verify your email. Server error with 500 status code.",
       });
    }
 };
@@ -229,8 +209,7 @@ exports.emailVerify = async (req, res) => {
    dan kembalikan response 200.
 */
 exports.resendEmail = async (req, res) => {
-   if (!req.body.token)
-      return res.status(400).json({ message: "Invalid or token not found" });
+   if (!req.body.token) return res.status(400).json({ message: "Invalid or token not found" });
 
    try {
       const token = req.body.token;

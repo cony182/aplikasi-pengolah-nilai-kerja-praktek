@@ -6,8 +6,6 @@ import { useNavigate, Link } from "react-router-dom";
 import Button from "../../components/Button";
 
 const Profile = () => {
-   const navigateTo = useNavigate();
-
    const url = window.location.pathname;
    const role = url.split("/")[1];
 
@@ -28,21 +26,19 @@ const Profile = () => {
    const [onProcess, setOnProcess] = useState(false);
    const [onChange, setOnChange] = useState(false);
 
-   // useEffect(() => {
-   //    if (fullname || nickname) setOnChange(true);
-   // }, [fullname, nickname]);
-
    useEffect(() => {
       axios
-         .get("http://192.168.100.2:5000/" + role + "/profile", {
+         .get("/" + role + "/profile", {
             withCredentials: true,
          })
          .then((response) => {
+            console.log(response);
             setUser(response.data);
+            // console.log(response.data);
             if (response.data.role === "siswa") {
-               setRoleUser(response.data.siswa);
-               setKelas(response.data.siswa.kela);
-               setWaliKelas(response.data.siswa.wali_kelas[0].guru);
+               response.data.siswa ? setRoleUser(response.data.siswa) : "";
+               response.data.siswa.kela ? setKelas(response.data.siswa.kela) : "";
+               response.data.siswa.wali_kelas[0].guru ? setWaliKelas(response.data.siswa.wali_kelas[0].guru) : null;
                setIsGuru(false);
                setLoading(false);
             } else {
@@ -52,7 +48,8 @@ const Profile = () => {
             }
          })
          .catch((err) => {
-            err.response.status == 403 ? navigateTo("/login") : console.error(err);
+            console.log(err);
+            // err.response.status == 403 ? navigateTo("/login") : console.error(err);
          });
    }, []);
 
@@ -60,10 +57,9 @@ const Profile = () => {
       if (onProcess) return;
 
       setOnProcess(true);
-      console.log("hitung");
       axios
          .post(
-            "http://192.168.100.2:5000/update/profile",
+            "/update/profile",
             {
                user: {
                   fullname: fullname,
@@ -122,7 +118,7 @@ const Profile = () => {
                            <div className="w-full px-4 h-2 -translate-y-12 flex justify-center lg:justify-start">
                               <div className="h-36 relative">
                                  <img
-                                    src={user.picture ? `http://192.168.100.2:5000/images/avatar/${user.picture}` : Logo}
+                                    src={user.picture ? `${axios.defaults.baseURL}/images/avatar/${user.picture}` : Logo}
                                     alt=""
                                     className={`h-36 w-36 rounded-full bg-gray-300 ring-2 ring-blue-300`}
                                  />
@@ -272,11 +268,7 @@ const Profile = () => {
                                                 <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Wali kelas</dt>
                                                    <dd className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:mt-0 sm:col-span-2">
-                                                      {kelas.kode_kelas ? (
-                                                         waliKelas.nama
-                                                      ) : (
-                                                         <div className="text-gray-500 dark:text-gray-400">Kosong</div>
-                                                      )}
+                                                      {waliKelas ? waliKelas.nama : <div className="text-gray-500 dark:text-gray-400">Kosong</div>}
                                                    </dd>
                                                 </div>
                                                 <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
